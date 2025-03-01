@@ -34,7 +34,9 @@ end
 function love.draw()
     love.graphics.draw(images.sky)
 
-    if gameState == 2 then
+    if gameState == 1 then
+        love.graphics.printf('Click anywhere to begin!', 0, 250, love.graphics.getWidth(), 'center')
+    elseif gameState == 2 then
         love.graphics.draw(images.target, target.x - target.radius, target.y - target.radius)
     end
     
@@ -42,8 +44,8 @@ function love.draw()
 
     love.graphics.setColor(1, 1, 1)
     love.graphics.setFont(gameFont)
-    love.graphics.print(score)
-    love.graphics.print(math.ceil(math.abs(timer)), 300, 0)
+    love.graphics.print('Score: ' .. score, 5, 5)
+    love.graphics.print('Timer: ' .. math.ceil(math.abs(timer)), 300, 5)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
