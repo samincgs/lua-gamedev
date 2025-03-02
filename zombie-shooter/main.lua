@@ -1,4 +1,7 @@
 function love.load()
+    math.randomseed(os.time())
+
+
     images = {}
     
     images.player = love.graphics.newImage('images/player.png')
@@ -16,7 +19,8 @@ function love.load()
     zombies = {}
     bullets = {}
 
-    gameState = 2
+    gameState = 1
+    myFont = love.graphics.newFont(30)
 
     zombieSpawnTime = 2
     zombieTimer = zombieSpawnTime 
@@ -24,17 +28,27 @@ function love.load()
 end
 
 function love.update(dt)
-    if love.keyboard.isDown('d') then
-        player.x = player.x + player.speed * dt
-    end
-    if love.keyboard.isDown('a') then
-        player.x = player.x - player.speed * dt
-    end
-    if love.keyboard.isDown('s') then
-        player.y = player.y + player.speed * dt
-    end
-    if love.keyboard.isDown('w') then
-        player.y = player.y - player.speed * dt
+    if gameState == 2 then
+        if love.keyboard.isDown('d') then
+            if player.x + images.player:getWidth() / 2 < love.graphics.getWidth() then
+                player.x = player.x + player.speed * dt
+            end
+        end
+        if love.keyboard.isDown('a') then
+            if player.x - images.player:getWidth() / 2 > 0 then
+                player.x = player.x - player.speed * dt
+            end
+        end
+        if love.keyboard.isDown('s') then
+            if player.y + images.player:getHeight() / 2 < love.graphics.getHeight() then
+                player.y = player.y + player.speed * dt
+            end
+        end
+        if love.keyboard.isDown('w') then
+            if player.y - images.player:getHeight() / 2 > 0 then
+                player.y = player.y - player.speed * dt
+            end
+        end
     end
 
     for i, z in ipairs(zombies) do
@@ -46,6 +60,8 @@ function love.update(dt)
             for i,z in ipairs(zombies) do 
                 zombies[i] = nil
                 gameState = 1
+                player.x = love.graphics.getWidth() / 2
+                player.y = love.graphics.getHeight() / 2
             end
         end
     end
@@ -96,6 +112,11 @@ end
 function love.draw()
     love.graphics.draw(images.background)
 
+    if gameState == 1 then
+        love.graphics.setFont(myFont)
+        love.graphics.printf('Click anywhere to begin!', 0, 50, love.graphics.getWidth(), 'center')
+    end
+
     player.rotation = getAngle(player.x, player.y, love.mouse.getX(), love.mouse.getY())
     love.graphics.draw(images.player, player.x, player.y, player.rotation, nil, nil, images.player:getWidth() / 2, images.player:getHeight() / 2)
 
@@ -108,13 +129,18 @@ function love.draw()
         love.graphics.draw(images.bullet, b.x, b.y, nil, 0.5, 0.5, images.bullet:getWidth() / 2, images.bullet:getHeight() / 2)
     end
 
-    love.graphics.print(#bullets)
+    
 
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    if button == 1 then
+    if gameState == 2 and button == 1 then
         spawnBullet()
+    end
+    if gameState == 1 and button == 1 then
+        zombieTimer = zombieSpawnTime 
+        zombieSpawnTime = 2
+        gameState = 2
     end
 end
 
@@ -130,7 +156,7 @@ function spawnZombie()
     local zombie = {}
     zombie.x = 0
     zombie.y = 0
-    zombie.speed = 180
+    zombie.speed = 200
     zombie.rotation = 0
     zombie.dead = false
 
