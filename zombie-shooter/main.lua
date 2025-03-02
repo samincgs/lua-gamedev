@@ -15,16 +15,17 @@ function love.load()
     player.y = love.graphics.getHeight() / 2
     player.speed = 220
     player.rotation = 0
+    player.injured = false
 
     zombies = {}
     bullets = {}
 
     gameState = 1
+    score = 0
     myFont = love.graphics.newFont(30)
 
     zombieSpawnTime = 2
     zombieTimer = zombieSpawnTime 
-
 end
 
 function love.update(dt)
@@ -58,10 +59,17 @@ function love.update(dt)
         local zombieToPlayerDistance = getDistance(z.x, z.y, player.x, player.y)
         if zombieToPlayerDistance < 30 then
             for i,z in ipairs(zombies) do 
+                if player.injured then
+                    gameState = 1
+                    player.injured = false
+                    player.speed = 220
+                    player.x = love.graphics.getWidth() / 2
+                    player.y = love.graphics.getHeight() / 2
+                else
+                    player.injured = true
+                    player.speed = player.speed + 20
+                end
                 zombies[i] = nil
-                gameState = 1
-                player.x = love.graphics.getWidth() / 2
-                player.y = love.graphics.getHeight() / 2
             end
         end
     end
@@ -75,8 +83,10 @@ function love.update(dt)
         for j, z in ipairs(zombies) do
             local bulletToZombieDistance = getDistance(b.x, b.y, z.x, z.y)
             if bulletToZombieDistance < 20 then
+                score = score + 1
                 b.dead = true
                 z.dead = true
+                
             end
         end
     end
@@ -116,9 +126,18 @@ function love.draw()
         love.graphics.setFont(myFont)
         love.graphics.printf('Click anywhere to begin!', 0, 50, love.graphics.getWidth(), 'center')
     end
+    
+    love.graphics.print('Score: ' .. score , 0, 0, nil, nil, nil, -10, -10)
+
+    love.graphics.print(tostring(player.injured), 50, 50)
 
     player.rotation = getAngle(player.x, player.y, love.mouse.getX(), love.mouse.getY())
+    if player.injured then
+        love.graphics.setColor(0.8, 0, 0)
+    end
     love.graphics.draw(images.player, player.x, player.y, player.rotation, nil, nil, images.player:getWidth() / 2, images.player:getHeight() / 2)
+
+    love.graphics.setColor(1, 1, 1)
 
     for i,z in ipairs(zombies) do
         z.rotation = getAngle(z.x, z.y, player.x, player.y)
@@ -128,9 +147,6 @@ function love.draw()
     for i,b in ipairs(bullets) do
         love.graphics.draw(images.bullet, b.x, b.y, nil, 0.5, 0.5, images.bullet:getWidth() / 2, images.bullet:getHeight() / 2)
     end
-
-    
-
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
@@ -141,6 +157,7 @@ function love.mousepressed(x, y, button, istouch, presses)
         zombieTimer = zombieSpawnTime 
         zombieSpawnTime = 2
         gameState = 2
+        score = 0
     end
 end
 
@@ -156,7 +173,7 @@ function spawnZombie()
     local zombie = {}
     zombie.x = 0
     zombie.y = 0
-    zombie.speed = 200
+    zombie.speed = math.random(160, 210)
     zombie.rotation = 0
     zombie.dead = false
 
