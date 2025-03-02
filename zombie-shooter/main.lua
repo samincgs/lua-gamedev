@@ -17,7 +17,6 @@ function love.load()
 
 end
 
-
 function love.update(dt)
     if love.keyboard.isDown('d') then
         player.x = player.x + player.speed * dt
@@ -32,7 +31,11 @@ function love.update(dt)
         player.y = player.y - player.speed * dt
     end
 
-
+    for i, z in ipairs(zombies) do
+        local zombieToPlayerAngle = getAngle(z.x, z.y, player.x, player.y)
+        z.x = z.x + math.cos(zombieToPlayerAngle) * z.speed * dt 
+        z.y = z.y + math.sin(zombieToPlayerAngle) * z.speed * dt 
+    end
 end
 
 function love.draw()
@@ -42,12 +45,9 @@ function love.draw()
     love.graphics.draw(images.player, player.x, player.y, player.rotation, nil, nil, images.player:getWidth() / 2, images.player:getHeight() / 2)
 
     for i,z in ipairs(zombies) do
-        love.graphics.draw(images.zombie, z.x, z.y)
+        z.rotation = getAngle(z.x, z.y, player.x, player.y)
+        love.graphics.draw(images.zombie, z.x, z.y, z.rotation, nil, nil, images.zombie:getWidth() / 2, images.zombie:getHeight() / 2)
     end
-end
-
-function getAngle(x1, y1, x2, y2)
-    return math.atan2(y2 - y1, x2 - x1)
 end
 
 function love.keypressed(key)
@@ -56,11 +56,16 @@ function love.keypressed(key)
     end
 end
 
+function getAngle(x1, y1, x2, y2)
+    return math.atan2(y2 - y1, x2 - x1)
+end
+
 function spawnZombie()
     local zombie = {}
     zombie.x = math.random(0, love.graphics.getWidth())
     zombie.y = math.random(0, love.graphics.getHeight())
     zombie.speed = 100
+    zombie.rotation = 0
 
     table.insert(zombies, zombie)
 
