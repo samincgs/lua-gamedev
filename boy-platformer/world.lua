@@ -5,7 +5,7 @@ world:setQueryDebugDrawing(true) -- for debugging
 
 world:addCollisionClass('Platform')
 world:addCollisionClass('Player') --[[{ignores = {'Platform'}}]]
-world:addCollisionClass('Danger')
+world:addCollisionClass('Danger', {ignores = {'Danger'}})
 
 -- dangerZone = world:newRectangleCollider(0, 550, 800, 50, {collision_class='Danger'})
 -- dangerZone:setType('static')
