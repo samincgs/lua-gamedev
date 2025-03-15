@@ -1,30 +1,18 @@
 function love.load()
+    require('libraries')
+
     love.window.setMode(1000, 768)
+    cam = cameraFile()
 
-    anim8 = require 'libraries/anim8/anim8'
-    sti = require 'libraries/Simple-Tiled-Implementation/sti'
-    wf = require 'libraries/windfield'
-
-
-    -- first created a new World for all the physics objects
-    local gravityY = 500
-    world = wf.newWorld(0, gravityY, false) -- parameters: gravityX, gravityY, sleepMode
-    world:setQueryDebugDrawing(true) -- for debugging
-
-    world:addCollisionClass('Platform')
-    world:addCollisionClass('Player') --[[{ignores = {'Platform'}}]]
-    world:addCollisionClass('Danger')
-
+    require('world')
     require('sprites')
     require('player')
+    require('enemy')
 
-    platform = world:newRectangleCollider(250, 400, 300, 100, {collision_class='Platform'})
-    platform:setType('static')
-
-    dangerZone = world:newRectangleCollider(0, 550, 800, 50, {collision_class='Danger'})
-    dangerZone:setType('static')
-
+    platforms = {}
     loadMap()
+
+    spawnEnemy(960, 320)
 
 end
 
@@ -32,14 +20,19 @@ function love.update(dt)
     world:update(dt)
     gameMap:update(dt)
     player:update(dt)
+    updateEnemies(dt)
+
+    cam:lookAt(player:getX(), love.graphics.getHeight() / 2)
     
 end
 
 function love.draw()
-    gameMap:drawLayer(gameMap.layers['Tile Layer 1'])
-    world:draw()
-    player:draw()
-
+    cam:attach()
+        gameMap:drawLayer(gameMap.layers['Tile Layer 1'])
+        world:draw()
+        player:draw()
+        drawEnemies()
+    cam:detach()
 end
 
 function love.keypressed(key) 
@@ -59,4 +52,16 @@ end
 
 function loadMap()
     gameMap = sti('maps/level1.lua')
+
+    for i, obj in pairs(gameMap.layers['Platforms'].objects) do
+        loadPlatform(obj.x, obj.y, obj.width, obj.height)
+    end
+end
+
+function loadPlatform(x, y, width, height)
+    if width > 0 and height > 0 then
+        local platform = world:newRectangleCollider(x, y, width, height, {collision_class='Platform'})
+        platform:setType('static')
+        table.insert(platforms, platform)
+    end
 end
