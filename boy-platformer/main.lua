@@ -1,20 +1,9 @@
 function love.load()
+    love.window.setMode(1000, 768)
+
     anim8 = require 'libraries/anim8/anim8'
+    sti = require 'libraries/Simple-Tiled-Implementation/sti'
     wf = require 'libraries/windfield'
-
-    
-
-    sprites = {}
-    sprites.playerSheet = love.graphics.newImage('images/playerSheet.png')
-
-    local columns = 15
-    local rows = 3
-    local grid = anim8.newGrid(sprites.playerSheet:getWidth() / columns, sprites.playerSheet:getHeight() / rows, sprites.playerSheet:getWidth(), sprites.playerSheet:getHeight())
-
-    animations = {}
-    animations.idle = anim8.newAnimation(grid('1-15', 1), 0.05)
-    animations.jump = anim8.newAnimation(grid('1-7', 2), 0.05)
-    animations.run = anim8.newAnimation(grid('1-15', 3), 0.05)
 
 
     -- first created a new World for all the physics objects
@@ -26,6 +15,7 @@ function love.load()
     world:addCollisionClass('Player') --[[{ignores = {'Platform'}}]]
     world:addCollisionClass('Danger')
 
+    require('sprites')
     require('player')
 
     platform = world:newRectangleCollider(250, 400, 300, 100, {collision_class='Platform'})
@@ -34,15 +24,19 @@ function love.load()
     dangerZone = world:newRectangleCollider(0, 550, 800, 50, {collision_class='Danger'})
     dangerZone:setType('static')
 
+    loadMap()
+
 end
 
 function love.update(dt)
     world:update(dt)
+    gameMap:update(dt)
     player:update(dt)
     
 end
 
 function love.draw()
+    gameMap:drawLayer(gameMap.layers['Tile Layer 1'])
     world:draw()
     player:draw()
 
@@ -62,3 +56,7 @@ end
 --         end
 --     end
 -- end
+
+function loadMap()
+    gameMap = sti('maps/level1.lua')
+end
