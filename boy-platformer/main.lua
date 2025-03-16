@@ -10,11 +10,18 @@ function love.load()
     
     cam = cameraFile()
     platforms = {}
+    saveData = {}
+    sounds = {}
     flagX = 0
     flagY = 0
     
-    saveData = {}
     saveData.currentLevel = 'level1'
+    sounds.jump = love.audio.newSource('sfx/jump.wav', 'static')
+    sounds.music = love.audio.newSource('sfx/music.mp3', 'stream')
+    sounds.music:setVolume(0.1)
+    sounds.music:setLooping(true)
+
+    sounds.music:play()
 
     if love.filesystem.getInfo('data.lua') then
         local data = love.filesystem.load('data.lua')
@@ -56,6 +63,7 @@ end
 function love.keypressed(key) 
     if key == 'up' then
         player:jump()
+        sounds.jump:play()
     end
 
     if key == 'r' then
