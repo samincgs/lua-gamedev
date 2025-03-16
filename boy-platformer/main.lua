@@ -52,9 +52,9 @@ function love.update(dt)
 end
 
 function love.draw()
+    love.graphics.draw(sprites.background)
     cam:attach()
         gameMap:drawLayer(gameMap.layers['Tile Layer 1'])
-        world:draw()
         player:draw()
         drawEnemies()
     cam:detach()
@@ -84,7 +84,7 @@ function loadMap(mapId)
     saveData.currentLevel = mapId
     love.filesystem.write('data.lua', table.show(saveData, 'saveData'))
     destroyAll()
-    player:setPosition(300, 100)
+    player:setPosition(playerStartX, playerStartY)
     gameMap = sti('maps/' .. saveData.currentLevel .. '.lua')
 
     for i, obj in pairs(gameMap.layers['Platforms'].objects) do

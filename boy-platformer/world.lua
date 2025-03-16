@@ -7,5 +7,5 @@ world:addCollisionClass('Platform')
 world:addCollisionClass('Player') --[[{ignores = {'Platform'}}]]
 world:addCollisionClass('Danger', {ignores = {'Danger'}})
 
--- dangerZone = world:newRectangleCollider(0, 550, 800, 50, {collision_class='Danger'})
--- dangerZone:setType('static')
+dangerZone = world:newRectangleCollider(-500, 800, 5000, 50, {collision_class='Danger'})
+dangerZone:setType('static')

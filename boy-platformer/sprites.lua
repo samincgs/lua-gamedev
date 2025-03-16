@@ -3,6 +3,7 @@ animations = {}
 
 sprites.playerSheet = love.graphics.newImage('images/playerSheet.png')
 sprites.enemySheet = love.graphics.newImage('images/enemySheet.png')
+sprites.background = love.graphics.newImage('images/background.png')
 
 local playerCol = 15
 local playerRow = 3
