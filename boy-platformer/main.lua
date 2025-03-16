@@ -1,20 +1,25 @@
 function love.load()
-    require('libraries')
-
     love.window.setMode(1000, 768)
-    cam = cameraFile()
-
+    
+    require('libraries')
+    
     require('world')
     require('sprites')
     require('player')
     require('enemy')
-
+    
+    cam = cameraFile()
     platforms = {}
     flagX = 0
     flagY = 0
     
     saveData = {}
     saveData.currentLevel = 'level1'
+
+    if love.filesystem.getInfo('data.lua') then
+        local data = love.filesystem.load('data.lua')
+        data()
+    end
 
     loadMap(saveData.currentLevel)
 
@@ -68,9 +73,10 @@ end
 -- end
 
 function loadMap(mapId)
+    saveData.currentLevel = mapId
+    love.filesystem.write('data.lua', table.show(saveData, 'saveData'))
     destroyAll()
     player:setPosition(300, 100)
-    saveData.currentLevel = mapId
     gameMap = sti('maps/' .. saveData.currentLevel .. '.lua')
 
     for i, obj in pairs(gameMap.layers['Platforms'].objects) do
